@@ -29,8 +29,8 @@
 \usepackage{float}
 \usepackage{enumerate}
 \usepackage{graphicx}
-\usepackage{subfigure}
 \usepackage{caption}
+\usepackage{subcaption}
 \graphicspath{ {./images/} }
 
 \fancyhead[L]{\small\leftmark}
@@ -310,18 +310,31 @@ These results show that DDPG preprocessing can improve the performance of object
 \newpage
 \section{Positive Instance}
 \begin{figure}[H]
-    \centering  %图片全局居中
-    \subfigure{
-    \includegraphics[width=0.45\textwidth]{images/instances/original_image_1.png}}
-    \subfigure{
-    \includegraphics[width=0.45\textwidth]{images/instances/adjusted_image_1.png}}
-    \setcounter{subfigure}{0}  %重新設置子圖計數器
-    \subfigure[Original image]{
-    \includegraphics[width=0.45\textwidth]{images/instances/original_image_2.png}}
-    \subfigure[Adjusted image]{
-    \includegraphics[width=0.45\textwidth]{images/instances/adjusted_image_2.png}}
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/instances/original_image_1.png}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/instances/adjusted_image_1.png}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/instances/original_image_2.png}
+        \caption{original image}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/instances/adjusted_image_2.png}
+        \caption{adjusted image}
+    \end{subfigure}
     \caption[Positive instances with DDPG adjustments]{Positive instances that demonstrate the difference between the original images (left) and their DDPG-adjusted versions (right). It's noteworthy that objects that were not detected in the original images are successfully identified in the processed images.}
-    \label{Fig.main}
 \end{figure}
 
 \chapter{Conclusion}
