@@ -163,26 +163,26 @@ After obtaining the four outputs from the DDPG model, we can adjust various aspe
 
 \begin{itemize}
 \item \textbf{Brightness}: The brightness of an image can be changed by a factor $\alpha$ as follows:
-\begin{equation}
-I(x,y)=\min(\alpha\cdot I(x,y),255)
-\end{equation}
+\begin{equation*}
+I(x,y)=\min(\alpha I(x,y),255)
+\end{equation*}
 
 \item \textbf{Contrast}: The contrast of an image can be changed by a factor $\alpha$ as follows: We define $gray()$ to convert an image into a grayscale image.
-\begin{gather}
-I_{gray}=\text{gray}(I)\notag \\
-I(x,y)=\min(\alpha\cdot I(x,y)+(1-\alpha)\cdot\mathrm{mean}(I_{gray}),255)
-\end{gather}
+\begin{gather*}
+I_{\text{gray}}=\text{gray}(I)\\
+I(x,y)=\min(\alpha I(x,y)+(1-\alpha)\text{mean}(I_{\text{gray}}),255)
+\end{gather*}
 
 \item \textbf{Saturation}: The saturation of an image can be changed by a factor $\alpha$ as follows:
-\begin{equation}
-I(x,y)=\min(\alpha\cdot I(x,y)+(1-\alpha)\cdot I_{gray},255)
-\end{equation}
+\begin{equation*}
+I(x,y)=\min(\alpha I(x,y)+(1-\alpha)I_{\text{gray}},255)
+\end{equation*}
 
 \item \textbf{Sharpness}: The sharpness of an image can be changed by a factor $\alpha$ as follows: We define $blur()$ as blurring the image
-\begin{gather}
-I_{blur}=\text{blur}(I) \notag \\
-I(x,y)=\min(\alpha\cdot I(x,y)+(1-\alpha)\cdot I_{blur},255)
-\end{gather}
+\begin{gather*}
+I_{\text{blur}}=\text{blur}(I) \\
+I(x,y)=\min(\alpha I(x,y)+(1-\alpha)I_{\text{blur}},255)
+\end{gather*}
 \end{itemize}
 
 \subsection{Object Detective with Yolov7}
@@ -229,18 +229,18 @@ After feature extraction through ResNet18, the generated feature maps are sent t
 The state of the agent is derived from RGB images from the COCO dataset \cite{lin2014microsoft}. Before inputting them into the DDPG model, the images are resized to a dimension of 224x224. This resizing step ensures uniformity in the input dimensions within the system for subsequent processing and analysis.
 
 \subsection{Action}
-The actions outputted by DDPG consist of four transformation factors: brightness, saturation, contrast, and sharpness. The values of these factors are constrained within the range of $a\in\lbrack0.5,1.5\rbrack$. By restricting the range of the transformation factors to 0.5 to 1.5, we ensure that the enhancement process does not result in excessive image distortion.
+The actions outputted by DDPG consist of four transformation factors: brightness, saturation, contrast, and sharpness. The values of these factors are constrained within the range of $\alpha\in\lbrack0.5,1.5\rbrack$. By restricting the range of the transformation factors to 0.5 to 1.5, we ensure that the enhancement process does not result in excessive image distortion.
 
 \subsection{Reward}
 For an image inputted into YOLOv7, we evaluate the score using two metrics: the recall and the precision. By using the following formula, we can calculate the score of the image. We set $\alpha=0.5$.
-\begin{equation}
-S_i=\alpha\cdot({\mathrm{precision}}_i)+(1-\alpha)\cdot({\mathrm{recall}}_i)
-\end{equation}
+\begin{equation*}
+S_i=\alpha({\text{precision}}_i)+(1-\alpha)({\text{recall}}_i)
+\end{equation*}
 With the formula for calculating the score of an image, we can now present the complete formula for the reward function:
-\begin{equation}
+\begin{equation*}
 \label{reward function}
-r_t={\beta\cdot\tanh(S_r-S_o)}
-\end{equation}
+r_t={\beta\tanh(S_r-S_o)}
+\end{equation*}
 In this formula, $S_r$ represents the score of the image after the action transformation, and $S_o$ represents the score of the original image. The difference between $S_r$ and $S_o$ indicates the variation in scores between the two images. A positive difference indicates that the adjusted image improves the detection performance of YOLOv7, while a negative difference suggests a negative impact on the detection performance. To ensure a smoother reward value, we use the $\tanh$ function. Additionally, the parameter $\beta$ is adjusted to control the curve of the $\tanh$ function, and in this case, $\beta$ is set to 4.0.
 
 
@@ -322,7 +322,7 @@ These results show that DDPG preprocessing can improve the performance of object
 \end{table} 
 
 \newpage
-\section{Positive Instance}
+\section{Successful Example}
 \begin{figure}[H]
     \centering
     \begin{subfigure}{0.45\textwidth}
