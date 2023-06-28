@@ -87,7 +87,7 @@ Despite some existing research efforts to improve object detection performance u
 The main contribution of this research is the first integration of deep reinforcement learning (DDPG) with the object detection model YOLOv7, applied in the image preprocessing stage to enhance object detection accuracy under adverse image conditions. Our approach considers image quality factors such as saturation, brightness, contrast, and sharpness, and employs deep reinforcement learning to automatically select the optimal preprocessing strategy for achieving the best image enhancement results. Through our experiments, we have demonstrated a significant improvement in object detection accuracy compared to using YOLOv7 alone. Our method not only enhances object detection performance but also provides a new direction for effectively handling image quality issues in deep learning.
 
 
-\chapter{Materials and Related Works}
+\chapter{Materials and Related Work}
 \section{Object Detection}
 Object detection is an important topic in computer vision that aims to identify the location and classify specific objects in an image. Here is a review of some significant research in this field:
 
@@ -140,7 +140,7 @@ Reinforcement learning is a method in machine learning that enables models to le
     \label{Fig.DDPG architecture} 
 \end{figure}
 
-\section{Related Works}
+\section{Related Work}
 \cite{caicedo2015active}, \cite{bueno2017hierarchical} used DRL for object detection by treating the object detection problem as an MDP and using a hierarchical approach for object detection. In their approach, the Agent is responsible for finding the region of interest in the image and then finding smaller regions from the previously selected regions, thus forming the hierarchy. The authors consider several different actions to improve the accuracy of bounding boxes around the target. They use image feature vectors and action histories to represent states, and IOU transformations as a bonus.
 
 \cite{jie2016tree} proposed an object detection method called Tree-RL, which utilizes two types of actions: panning (8 actions) and zooming (5 actions). The state is defined as the combination of the feature vector of the current window, the feature vector of the whole image, and the historical actions. Feature vectors are extracted from the ImageNet-trained VGG-16 model and rewarded with IOU transformations. tree-RL performs object detection by top-down tree search, starting from the whole image and selecting the best action in each window to generate two new windows.
@@ -289,12 +289,47 @@ As shown in the figure \ref{Fig.Training reward}, after 10 epochs of training, o
 Among our 5,000 test images, more than 4000 images had a score difference of zero. This may suggest that in these images, DDPG's preprocessing did not change the result of object detection. For the remaining approximately 900 images, we observed a difference in scores, of which 691 images had a positive score difference, and 203 images had a negative score difference, as shown in Figure \ref{Fig./Test difference of score}.
 
 A positive score difference implies that the image preprocessed by DDPG is superior to the original image in terms of object detection results, while a negative score difference means the detection effect is worse. However, we can see that among the images with a score difference, the number of images with a positive score difference is significantly more than the images with a negative score difference. This result indicates that using DDPG for preprocessing can improve the effect of object detection in some cases. However, we also noticed that for a portion of images (about 4\% of the test images), DDPG preprocessing may lead to a decrease in object detection efficiency. This could indicate that in certain special cases, the DDPG model has not yet found an appropriate preprocessing strategy.
+
 \begin{figure}[!htb] 
     \centering 
     \includegraphics[width=0.9\textwidth]{images/test difference of score.png}
     \caption{Test difference of score} 
     \label{Fig./Test difference of score} 
 \end{figure}
+
+\begin{table}[H]
+    \centering
+    \label{table:mean_and_std} 
+    \begin{tabular}{c c c}
+        \toprule
+        & \textbf{Mean} & \textbf{Standard Deviation} \\
+        \midrule
+        \textbf{Score Difference} & 0.057 & 0.158 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Mean and standard deviation of score difference}
+\end{table}
+
+
+\subsection{Paired Sample t-Test Results and Implications}
+To quantify these observations and determine whether DDPG preprocessing has a statistically significant effect on object detection, we conducted a Paired Sample t-Test. In this t-test, we considered the original score and the score after DDPG preprocessing for each image as a pair of matched samples.
+
+To properly interpret the results of the paired sample t-test, we must consider the implications of both the t-statistic and the p-value. In this experiment, the t-statistic is 8.80, which quantifies the degree of difference between the object detection scores of the original images and those processed by DDPG. The sign of the t-statistic reflects the direction of this difference—in our case, a positive t-statistic suggests that the scores of the original images are, on average, higher than those of the images processed by DDPG.
+
+Next, we consider the p-value, a statistical indicator used to determine whether results are significant. Specifically, the p-value is the probability of observing our actual data (or more extreme data) given that our null hypothesis is true. In this experiment, the null hypothesis is "there is no significant difference between the scores of the original images and the images processed by DDPG." Our obtained p-value is 1.86e-18, a very small number that is far below typical significance level thresholds (such as 0.05 or 0.01). Therefore, we have ample evidence to reject the null hypothesis and conclude that there is a significant difference between the scores of the original images and those processed by DDPG.
+
+\begin{table}[H]
+    \centering
+    \label{table:t_test_results} 
+    \begin{tabular}{c c c}
+        \toprule
+        & \textbf{t-statistic} & \textbf{p-value} \\
+        \midrule
+        \textbf{Paired Samples} & 8.803 & 1.861e-18 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Paired t-test results for image score}
+\end{table}
 
 \subsection{DDPG Preprocessing in Object Detection: A Comparison}
 To evaluate the impact of DDPG preprocessing on the performance of the object detection model, we separately compared the performance of the object detection models that used DDPG preprocessing and those that did not on the two main performance indicators: precision and recall. As shown in Figure \ref{Fig.Comparison result}, the object detection model processed by DDPG is 2.3\% higher in precision and 0.9\% higher in recall than the model not processed by DDPG.
@@ -308,18 +343,18 @@ These results show that DDPG preprocessing can improve the performance of object
 \end{figure}
 
 \begin{table}[H]
-	\centering
-    \label{Fig.Comparison result} 
-	\begin{tabular}{c c c}
-		\toprule  %添加表格头部粗线
-		\textbf{Metric}   &\textbf{Precision}  &\textbf{Recall} \\
-		\midrule  %添加表格中横线
-		\textbf{yolov7}    & 0.50  & 0.406 \\
-		\textbf{yolov7\_RL} & 0.523 & 0.415 \\
-		\bottomrule %添加表格底部粗线
-	\end{tabular}
-	\caption{Comparison result}
-\end{table} 
+    \centering
+    \label{table:comparison_result}
+    \begin{tabular}{l c c}
+        \toprule
+        & \textbf{Precision} & \textbf{Recall} \\
+        \midrule
+        \textbf{yolov7} & 0.50 & 0.406 \\
+        \textbf{yolov7\_RL} & 0.523 & 0.415 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of yolov7 and yolov7\_RL}
+\end{table}
 
 \newpage
 \section{Successful Example}
@@ -340,13 +375,25 @@ These results show that DDPG preprocessing can improve the performance of object
     \begin{subfigure}{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/instances/original_image_2.png}
-        \caption{original image}
     \end{subfigure}
     \quad
     \begin{subfigure}{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/instances/adjusted_image_2.png}
-        \caption{adjusted image}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/instances/original_image_3.png}
+        \caption{Original image}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/instances/adjusted_image_3.png}
+        \caption{Adjusted image}
     \end{subfigure}
     \caption[Positive instances with DDPG adjustments]{Positive instances that demonstrate the difference between the original images (left) and their DDPG-adjusted versions (right). It's noteworthy that objects that were not detected in the original images are successfully identified in the processed images.}
 \end{figure}
