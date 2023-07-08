@@ -51,7 +51,7 @@ In recent years, deep learning techniques have made significant progress in the 
 }
 
 \newcommand*\Acknowledgements{%
-感謝我...}
+}
 
 
 
@@ -147,6 +147,31 @@ Reinforcement learning is a method in machine learning that enables models to le
 
 \cite{nayak2020reinforcement} proposed a preprocessing algorithm called ObjectRL. The main idea is to adapt the preprocessing steps applied to the image so that the pre-trained object detector works more efficiently.The novelty of the ObjectRL algorithm is that it recognizes that an image that looks good to the human eye may not be suitable as an input to the pre-trained object detector. In other words, the subjective quality of an image may not be relevant to its object detection performance. Therefore, ObjectRL tries to select the most suitable image for the object detection task by learning appropriate preprocessing strategies. This work is similar to our work.
 
+\cite{wang2018multitask} proposed a reinforcement learning method based on the Deep Q-Network (DQN), significantly reducing redundant search steps through a novel reward function design. During the entire localization process, the detector is considered as an agent that adjusts the size of the bounding box for object localization and employs a terminal action classifier to determine when to cease searching. Furthermore, the researchers applied multi-task learning to enhance the agent's performance. Experimental results showed that this approach demonstrated exceptional performance on the PASCAL Visual Object Classes Challenge (VOC) 2007 dataset.
+
+\cite{ayle2020bar} introduced a reinforcement learning agent called "Bounding-box Automated Refinement" (BAR) that aims to enhance object detection and recognition accuracy using deep learning techniques. The BAR agent was specifically designed for industrial applications to improve production efficiency. By learning from human demonstrations, BAR autonomously corrects inaccurate annotations, thereby reducing the time and effort required for manual dataset labeling. The study compared two training methods: offline deep reinforcement learning (DRL) and online training using a contextual bandit (CB) approach. The results revealed that both methods successfully improved annotation accuracy and reduced the need for manual intervention, regardless of the initial labeling approach. Overall, the research presented the development of BAR as a reinforcement learning agent that effectively improves the quality of existing bounding boxes, demonstrating its valuable applications in real-world scenarios.
+
+\cite{uzkent2020efficient} presents an adaptive framework aiming to reduce the cost of using high-resolution images in computer vision tasks. The method utilizes Convolutional Neural Networks (CNNs) for image recognition and object detection, selectively employing high-resolution images only when fine-grained details are necessary. By training an intelligent agent, the framework first processes low-resolution images to capture the global image context and then selectively requests specific high-resolution image patches for accurate detection. Experimental results on the xView dataset demonstrate that compared to detectors exclusively using high-resolution images, the proposed method achieves nearly the same accuracy while using high-resolution images only about 30\% of the time, resulting in a roughly 50\% increase in runtime performance.
+
+\chapter{Problem Definition and Method Selection}
+Before introducing the method we propose, it is first necessary to define the problem we are aiming to solve and explain why we have chosen to use reinforcement learning as our primary approach.
+\section{Problem Definition}
+Object detection is a core problem in the field of computer vision, aiming to identify and locate specific objects in given images. From autonomous vehicles to medical image analysis, the applications of object detection have encompassed many aspects of our lives. However, despite significant advancements in this field in recent years, improving the accuracy and efficiency of object detection remains a major challenge.
+
+In real-world application scenarios, the quality and characteristics of images can be influenced by various factors, including lighting conditions, camera angles, environmental variables, and more. These factors can have a significant impact on the features of an image, thereby affecting the effectiveness of object detection. Therefore, in order to improve the performance of object detection, we need to explore methods to automatically adjust the parameters of an image, such as saturation, brightness, contrast, and sharpness, to enhance the image quality and the clarity of its features. We expect that by adjusting the images in this manner, and subsequently applying an object detection model, we can achieve better detection results.
+
+\section{Method Selection}
+Finding a method that can automatically adjust image parameters, such as saturation, brightness, contrast, and sharpness, may pose challenges to traditional machine learning methods and supervised learning within deep learning. These methods usually rely on a large amount of labeled data, which may be difficult to obtain or not fully applicable in real-world situations.
+
+To address the challenges mentioned above, we have chosen to use Reinforcement Learning, specifically the Deep Deterministic Policy Gradient (DDPG), as our primary solution strategy. Compared to traditional supervised learning methods, Reinforcement Learning does not rely on a large amount of labeled data. Instead, it learns and adjusts its policy by interacting with the environment. This learning approach allows the model to better adapt to environmental changes and make effective decisions in information-sparse scenarios.
+
+An essential characteristic of Reinforcement Learning is its ability for exploration and exploitation. This capability allows the model not only to rely on the known best strategies during the learning process but also to explore new possibilities to find better solutions. This is particularly crucial for our problem, as the image parameters most suited to improving object detection accuracy might vary under different environmental conditions.
+
+The reasons why we chose to use Deep Deterministic Policy Gradient (DDPG) and the advantages it brings can be primarily categorized into the following points:
+\begin{itemize}
+    \item \textbf{Self-learning and Optimization} : DDPG can learn from previous experiences and progressively optimize its decision-making strategy. This allows the model to maintain high efficiency in constantly changing environments.
+    \item \textbf{Capability of Handling Highly Continuous Action Spaces} : DDPG has the ability to handle highly continuous action spaces. This is especially important in image processing applications where image parameters (such as saturation, brightness, contrast, and sharpness) need fine-tuning.
+\end{itemize}
 
 \chapter{Proposed Method}
 \section{System Design}
@@ -250,7 +275,7 @@ In this section, we will introduce the content of the experiment, including the 
 \section{Experimental Design}
 In our experiment, we used the Coco dataset \cite{lin2014microsoft} as the training set. Due to the large size of the Coco dataset and limited experimental resources, we randomly sampled 20,000 data instances for training. A total of 10 epochs were conducted. Table \ref{Fig.DDPG parameter} presents the training parameters of DDPG.
 
-During the training process, we primarily monitor changes in rewards. After training is completed, we proceed with testing. In our testing experiment, we utilize 5000 images, observing the score difference between the adjusted images and the original ones. Ultimately, we will compare the performance differences between object detection models preprocessed with DDPG and those without DDPG preprocessing. We will evaluate our results based on two key metrics: recall and precision.
+During the training process, we primarily monitor changes in rewards. After training is completed, we proceed with testing. In our testing experiment, we utilize 5000 images, observing the score difference between the adjusted images and the original ones. We will also perform a paired sample t-test to assess the validity of the test. Ultimately, we will compare the performance differences between object detection models preprocessed with DDPG and those without DDPG preprocessing. We will evaluate our results based on two key metrics: recall and precision.
 
 \begin{table}[H]
 	\centering
@@ -275,24 +300,31 @@ During the training process, we primarily monitor changes in rewards. After trai
 \end{table} 
 
 \section{Experimental Result}
+After designing and conducting the experiments, the next step is to analyze and interpret our results. In this section, we will present our experimental results in detail and delve into the underlying reasons for these outcomes.
+
+\newpage
 \subsection{DDPG Training Reward}
-\begin{figure}[!htb] 
+
+As shown in the figure \ref{Fig.Training reward}, after 10 epochs of training, our reward finally converged to 0.05. Our reward function is designed to easily generate so-called sparse rewards. In many images, the reward value is 0. There may be two reasons for this: one is that the objects in the image may have been completely detected, so no matter how the image is adjusted, its precision and recall will not increase, resulting in a reward of 0; another possible reason is that DDPG has not learned how to effectively adjust the image, thus getting the same detection result, and therefore the reward is 0. These two possible factors lead to a convergence of reward value at a lower level. However, although the reward seems to converge only to a relatively small value, it is still greater than 0, implying that DDPG has learned how to adjust the image to improve the effect of object detection.
+\begin{figure}[H] 
     \centering 
-    \includegraphics[width=0.9\textwidth]{images/training reward.png}
+    \includegraphics[width=\textwidth]{images/training reward.png}
     \caption{Training reward} 
     \label{Fig.Training reward} 
 \end{figure}
-As shown in the figure \ref{Fig.Training reward}, after 10 epochs of training, our reward finally converged to 0.05. Our reward function is designed to easily generate so-called sparse rewards. In many images, the reward value is 0. There may be two reasons for this: one is that the objects in the image may have been completely detected, so no matter how the image is adjusted, its precision and recall will not increase, resulting in a reward of 0; another possible reason is that DDPG has not learned how to effectively adjust the image, thus getting the same detection result, and therefore the reward is 0. These two possible factors lead to a convergence of reward value at a lower level. However, although the reward seems to converge only to a relatively small value, it is still greater than 0, implying that DDPG has learned how to adjust the image to improve the effect of object detection.
 
+\newpage
 \subsection{Test Score Differences with DDPG}
 
 Among our 5,000 test images, more than 4000 images had a score difference of zero. This may suggest that in these images, DDPG's preprocessing did not change the result of object detection. For the remaining approximately 900 images, we observed a difference in scores, of which 691 images had a positive score difference, and 203 images had a negative score difference, as shown in Figure \ref{Fig./Test difference of score}.
 
 A positive score difference implies that the image preprocessed by DDPG is superior to the original image in terms of object detection results, while a negative score difference means the detection effect is worse. However, we can see that among the images with a score difference, the number of images with a positive score difference is significantly more than the images with a negative score difference. This result indicates that using DDPG for preprocessing can improve the effect of object detection in some cases. However, we also noticed that for a portion of images (about 4\% of the test images), DDPG preprocessing may lead to a decrease in object detection efficiency. This could indicate that in certain special cases, the DDPG model has not yet found an appropriate preprocessing strategy.
 
-\begin{figure}[!htb] 
+In our analysis of the score differences, we also calculated the average and standard deviation of these differences. We found that the average score difference was 0.057, indicating that overall, the object detection scores of images preprocessed by DDPG slightly improved compared to the original images. The standard deviation of the score differences was 0.158, which shows a relatively large range of score differences, suggesting that the impact of DDPG preprocessing on object detection varies among different images.
+\newpage
+\begin{figure}[H] 
     \centering 
-    \includegraphics[width=0.9\textwidth]{images/test difference of score.png}
+    \includegraphics[width=\textwidth]{images/test difference of score.png}
     \caption{Test difference of score} 
     \label{Fig./Test difference of score} 
 \end{figure}
@@ -314,7 +346,7 @@ A positive score difference implies that the image preprocessed by DDPG is super
 \subsection{Paired Sample t-Test Results and Implications}
 To quantify these observations and determine whether DDPG preprocessing has a statistically significant effect on object detection, we conducted a Paired Sample t-Test. In this t-test, we considered the original score and the score after DDPG preprocessing for each image as a pair of matched samples.
 
-To properly interpret the results of the paired sample t-test, we must consider the implications of both the t-statistic and the p-value. In this experiment, the t-statistic is 8.803, which quantifies the degree of difference between the object detection scores of the original images and those processed by DDPG. The sign of the t-statistic reflects the direction of this difference—in our case, a positive t-statistic suggests that the scores of the original images are, on average, higher than those of the images processed by DDPG.
+In order to correctly interpret the results of a paired sample t-test, we must consider the meaning of the t statistic and the p value. In this experiment, the t statistic is 8.803, which quantifies the degree of difference between the object detection scores of the original images and those processed by DDPG. The sign of the t statistic reflects the direction of this difference - in our case, a positive t statistic indicates that the average score of images processed by DDPG is higher than that of the original images.
 
 Next, we consider the p-value, a statistical indicator used to determine whether results are significant. Specifically, the p-value is the probability of observing our actual data (or more extreme data) given that our null hypothesis is true. In this experiment, the null hypothesis is "there is no significant difference between the scores of the original images and the images processed by DDPG." Our obtained p-value is 1.861e-18, a very small number that is far below typical significance level thresholds (such as 0.05 or 0.01). Therefore, we have ample evidence to reject the null hypothesis and conclude that there is a significant difference between the scores of the original images and those processed by DDPG.
 
@@ -395,7 +427,7 @@ These results show that DDPG preprocessing can improve the performance of object
         \includegraphics[width=\textwidth]{images/instances/adjusted_image_3.png}
         \caption{Adjusted image}
     \end{subfigure}
-    \caption[Positive instances with DDPG adjustments]{Positive instances that demonstrate the difference between the original images (left) and their DDPG-adjusted versions (right). It's noteworthy that objects that were not detected in the original images are successfully identified in the processed images.}
+    \caption[Successful example with DDPG adjustments]{Successful example that demonstrate the difference between the original images (left) and their DDPG-adjusted versions (right). It's noteworthy that objects that were not detected in the original images are successfully identified in the processed images.}
 \end{figure}
 
 \chapter{Conclusion}
