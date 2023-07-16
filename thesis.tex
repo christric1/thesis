@@ -41,7 +41,7 @@
 
 \newcommand*\Keywords英文{Deep reinforcement learning, Object detection}
 \newcommand*\Abstract英文{%
-In recent years, deep learning techniques have made significant progress in the field of image processing and analysis, especially in the area of object detection. However, the performance of trained object detection neural networks depends largely on the image quality, and it is still a challenging problem to improve the detection accuracy. Image quality can be affected by a variety of factors, such as blurred images, noise, low contrast, insufficient lighting, or overexposure. These problems may make it difficult for deep learning models to accurately identify and localize objects. To overcome these challenges, this study proposes a method to achieve enhanced object detection using deep reinforcement learning DDPG as well as YOLOv7. In this approach, we use pre-processing techniques for image saturation, brightness, contrast, and sharpness to improve image quality. These pre-processing steps are performed by the DDPG algorithm to further enhance the image. Then, we use the pre-processed images as input to YOLOv7 to achieve better object detection. Our experimental results show that this new object detection method achieves better detection accuracy than using only YOLOv7 alone.
+In recent years, deep learning techniques have made significant progress in the field of image processing and analysis, especially in the area of object detection. However, the performance of trained object detection neural networks depends largely on the image quality, and it is still a challenging problem to improve the detection accuracy. Image quality can be affected by a variety of factors, such as blurred images, noise, low contrast, insufficient lighting, or overexposure. These problems may make it difficult for deep learning models to accurately identify and localize objects. To overcome these challenges, this study proposes a method to achieve enhanced object detection using deep reinforcement learning DDPG as well as YOLOv7. In this approach, we use preprocessing techniques for image saturation, brightness, contrast, and sharpness to improve image quality. These preprocessing steps are performed by the DDPG algorithm to further enhance the image. Then, we use the pre-processed images as input to YOLOv7 to achieve better object detection. Our experimental results show that this new object detection method achieves better detection accuracy than using only YOLOv7 alone.
 }
 
 
@@ -51,6 +51,13 @@ In recent years, deep learning techniques have made significant progress in the 
 }
 
 \newcommand*\Acknowledgements{%
+在此，我深感榮幸並由衷地對所有在我的學術旅程中給予我幫助的人表示感謝。我要首先感謝我的指導教授 \underline{賀保羅}教授。他不僅願意接受我轉到他的實驗室，更在他的專業領域之外，毫無保留地引導我完成這篇論文。他對我慷慨的承擔和指導讓我受益良多，而我將永遠珍視這份特殊的學術關係。
+
+我同樣要向我的實驗室同學：\underline{益宗}、\underline{昱伶}、\underline{中柏}、\underline{筱萱}和\underline{怡靜}表達深深的感謝。在最後的學期裡，當我面臨挑戰與困境時，他們都伸出援手，提供了我莫大的支援與鼓勵。他們的熱忱、關心與友誼成為我寶貴的支持力量。
+
+最後，我要向我的家人致上最深的謝意。在我攻讀研究所期間，他們給予我金錢與精神上的支持。他們的慈愛與鼓勵為我鋪平了前行的道路，並為我在學術之路上繼續前進提供了堅實的後盾。
+
+這篇論文的完成並非只有我一人的功勞，每一位在我學術旅程中陪伴我的人，都是這份成就不可或缺的一部分。我再次對你們表達最深的感激之情，這是我心中永恆的感謝。
 }
 
 
@@ -178,47 +185,43 @@ The reasons why we chose to use Deep Deterministic Policy Gradient (DDPG) and th
 The primary objective of this study is to improve the accuracy of object detection. We propose a method that combines Deep Deterministic Policy Gradient (DDPG) with YOLOv7 to enhance the effectiveness of object detection. This chapter will provide a detailed introduction to the system's design and implementation. Figure \ref{Fig.System workflow} shows the complete system flow chart.
 
 \subsection{Preprocessing with DDPG}
-In the entire system workflow, we first preprocess the image. This preprocessing stage involves using a technique called Deep Deterministic Policy Gradient (DDPG) to automatically adjust the image. Initially, we input the original image into the DDPG model. The DDPG model generates four parameters based on the image information, which are used to adjust the image's saturation, brightness, contrast, and sharpness. These parameters are known as transformation factors.
-
-Next, we use these four transformation factors to adjust the original image and generate the adjusted image. This adjustment alters the visual characteristics of the image, enabling the subsequent object detection module to perform more accurate detections. Finally, we input the adjusted image into the YOLOv7 object detection model to enhance the accuracy of object detection.
+In the entire system workflow, we first preprocess the image. This preprocessing stage involves using a technique called Deep Deterministic Policy Gradient (DDPG) to automatically adjust the image. Initially, we input the original image into the DDPG model. The DDPG model generates four parameters based on the image information, which are used to adjust the image's saturation, brightness, contrast, and sharpness. These parameters are known as transformation factors. Subsequently, we use these four transformation factors to modify the original image and generate an adjusted image, which is then input into the object detection model, YOLOv7.
 
 During the model training process, we utilize the precision and recall of the image as the indicators derived from the output of the YOLOv7 model. These indicators are used to train the DDPG model, thereby enhancing the capabilities of DDPG. By continuously adjusting the transformation factors, the DDPG model learns how to generate better transformation parameters to optimize the performance of the object detection model.
 
-After obtaining the four outputs from the DDPG model, we can adjust various aspects of the image including brightness, contrast, saturation, and sharpness through numerical methods. We provide a formula for adjusting the pixel intensity $(I)$ at the coordinate $(x,y)$. We assume that the transformation factor $\alpha$.
+Based on the four outputs obtained from the DDPG model, we can use numerical methods to adjust the brightness, contrast, saturation, and sharpness of an image. We define $\alpha_{\text{br}}$, $\alpha_{\text{co}}$, $\alpha_{\text{sa}}$, and $\alpha_{\text{sh}}$ as the transformation factors for brightness, contrast, saturation, and sharpness generated by DDPG, respectively. For a given pixel intensity $(I)$ at coordinates $(x,y)$, we use the following formula for adjustment:
 
 \begin{itemize}
-\item \textbf{Brightness}: The brightness of an image can be changed by a factor $\alpha$ as follows:
+\item \textbf{Brightness}: The brightness of an image can be changed by a factor $\alpha_{\text{br}}$ as follows:
 \begin{equation*}
-I(x,y)=\min(\alpha I(x,y),255)
+I(x,y)=\min(\alpha_{\text{br}} I(x,y),255)
 \end{equation*}
 
-\item \textbf{Contrast}: The contrast of an image can be changed by a factor $\alpha$ as follows: We define $gray()$ to convert an image into a grayscale image.
+\item \textbf{Contrast}: The contrast of an image can be changed by a factor $\alpha_{\text{co}}$ as follows: We define $gray()$ to convert an image into a grayscale image.
 \begin{gather*}
 I_{\text{gray}}=\text{gray}(I)\\
-I(x,y)=\min(\alpha I(x,y)+(1-\alpha)\text{mean}(I_{\text{gray}}),255)
+I(x,y)=\min(\alpha_{\text{co}} I(x,y)+(1-\alpha_{\text{co}})\text{mean}(I_{\text{gray}}),255)
 \end{gather*}
 
-\item \textbf{Saturation}: The saturation of an image can be changed by a factor $\alpha$ as follows:
+\item \textbf{Saturation}: The saturation of an image can be changed by a factor $\alpha_{\text{sa}}$ as follows:
 \begin{equation*}
-I(x,y)=\min(\alpha I(x,y)+(1-\alpha)I_{\text{gray}},255)
+I(x,y)=\min(\alpha_{\text{sa}} I(x,y)+(1-\alpha_{\text{sa}})I_{\text{gray}},255)
 \end{equation*}
 
-\item \textbf{Sharpness}: The sharpness of an image can be changed by a factor $\alpha$ as follows: We define $blur()$ as blurring the image
+\item \textbf{Sharpness}: The sharpness of an image can be changed by a factor $\alpha_{\text{sh}}$ as follows: We define $blur()$ as blurring the image
 \begin{gather*}
 I_{\text{blur}}=\text{blur}(I) \\
-I(x,y)=\min(\alpha I(x,y)+(1-\alpha)I_{\text{blur}},255)
+I(x,y)=\min(\alpha_{\text{sh}} I(x,y)+(1-\alpha_{\text{sh}})I_{\text{blur}},255)
 \end{gather*}
 \end{itemize}
 
 \subsection{Object Detective with Yolov7}
-In the object detection module of the system, we use the pre-trained YOLOv7, an object detection model that can locate and classify objects simultaneously in a single inference. In this module, we take pre-processed images as input for object detection, and YOLOv7 analyzes and processes the images and outputs the results, including the object location and category. These outputs can be used to evaluate the performance of the object detection model, which we measure using two metrics: recall and precision.
+In the object detection module of the system, we use the pre-trained YOLOv7, an object detection model that can locate and classify objects simultaneously in a single inference. In this module, we take pre-processed images as input for object detection, and YOLOv7 analyzes and processes the images and outputs the results, including the object location and category. These outputs can be used to evaluate the performance of the object detection model, which we measure using two metrics: recall and precision. Recall indicates the ability of the model to correctly detect the actual objects that are present, while precision indicates how many of the objects detected by the model are actually correct.
 
-Recall indicates the ability of the model to correctly detect the actual objects that are present, while precision indicates how many of the objects detected by the model are actually correct. The values of these metrics can be used for subsequent learning in the DDPG network.
+During the training process, we feed both the original and adjusted images into YOLOv7. Each image will produce corresponding metrics: recall and precision. We then use these metrics to compute the corresponding rewards through the reward function. These rewards are utilized for subsequent learning in DDPG. More detailed explanations will be introduced in the following summary.
 
 \subsection{System Integration}
-In the system, we integrate the preprocessing module and the object detection module, which improves the accuracy of object detection. The specific workflow is as follows: Firstly, the original image undergoes image adjustments through the preprocessing module. The preprocessing module utilizes the DDPG model to generate adjustment parameters based on the image information, and applies these parameters to the image, resulting in an adjusted image. The adjustment parameters include transformation factors for saturation, brightness, contrast, and sharpness.
-
-Next, the adjusted image is inputted into the object detection module for object detection. The object detection module employs the YOLOv7 network for inference, and performs object localization and classification based on the image features. The output of the model includes the positions and class information of the detected objects.
+In the system, we integrate the preprocessing module and the object detection module, which improves the accuracy of object detection. The specific workflow is as follows: Firstly, the original image undergoes image adjustments through the preprocessing module. The preprocessing module utilizes the DDPG model to generate adjustment parameters based on the image information, and applies these parameters to the image, resulting in an adjusted image. The adjustment parameters include transformation factors for saturation, brightness, contrast, and sharpness. Next, the adjusted image is inputted into the object detection module for object detection. The object detection module employs the YOLOv7 network for inference, and performs object localization and classification based on the image features. The output of the model includes the positions and class information of the detected objects.
 
 In summary, in the entire system, we integrate the preprocessing module and the object detection module to enhance the accuracy of object detection. By adjusting the image through the preprocessing module and inputting the adjusted image into the object detection module, we can obtain more accurate object detection results. 
 
@@ -250,6 +253,8 @@ After feature extraction through ResNet18, the generated feature maps are sent t
     \label{Fig.DDPG network architecture} 
 \end{figure}
 
+Our primary motivation for integrating ResNet18 and fully connected layers is due to ResNet18's capability of extracting deep features from images. These features encapsulate multi-dimensional information about an object, such as its shape, texture, and color. The fully connected layers then learn how to make effective decisions based on the feature maps extracted from ResNet18. This includes adjusting elements like image saturation, brightness, contrast, and sharpness to enhance specific features within the image or make other image adjustments, thereby improving the accuracy and efficiency of object detection.
+
 \subsection{State}
 The state of the agent is derived from RGB images from the COCO dataset \cite{lin2014microsoft}. Before inputting them into the DDPG model, the images are resized to a dimension of 224x224. This resizing step ensures uniformity in the input dimensions within the system for subsequent processing and analysis.
 
@@ -257,25 +262,24 @@ The state of the agent is derived from RGB images from the COCO dataset \cite{li
 The actions outputted by DDPG consist of four transformation factors: brightness, saturation, contrast, and sharpness. The values of these factors are constrained within the range of $\alpha\in\lbrack0.5,1.5\rbrack$. By restricting the range of the transformation factors to 0.5 to 1.5, we ensure that the enhancement process does not result in excessive image distortion.
 
 \subsection{Reward}
-For an image inputted into YOLOv7, we evaluate the score using two metrics: the recall and the precision. By using the following formula, we can calculate the score of the image. We set $\alpha=0.5$.
+For an image inputted into YOLOv7, we evaluate the score using two metrics: the recall and the precision. By using the following formula, we can calculate the score of the image. We set $\beta=0.5$.
 \begin{equation*}
-S_i=\alpha({\text{precision}}_i)+(1-\alpha)({\text{recall}}_i)
+S_i=\beta({\text{precision}}_i)+(1-\beta)({\text{recall}}_i)
 \end{equation*}
 With the formula for calculating the score of an image, we can now present the complete formula for the reward function:
 \begin{equation*}
-\label{reward function}
-r_t={\beta\tanh(S_r-S_o)}
+r_t={\gamma\tanh(S_r-S_o)}
 \end{equation*}
-In this formula, $S_r$ represents the score of the image after the action transformation, and $S_o$ represents the score of the original image. The difference between $S_r$ and $S_o$ indicates the variation in scores between the two images. A positive difference indicates that the adjusted image improves the detection performance of YOLOv7, while a negative difference suggests a negative impact on the detection performance. To ensure a smoother reward value, we use the $\tanh$ function. Additionally, the parameter $\beta$ is adjusted to control the curve of the $\tanh$ function, and in this case, $\beta$ is set to 4.0.
+In this formula, $S_r$ represents the score of the image after the action transformation, and $S_o$ represents the score of the original image. The difference between $S_r$ and $S_o$ indicates the variation in scores between the two images. A positive difference indicates that the adjusted image improves the detection performance of YOLOv7, while a negative difference suggests a negative impact on the detection performance. To ensure a smoother reward value, we use the $\tanh$ function. Additionally, the parameter $\gamma$ is adjusted to control the curve of the $\tanh$ function, and in this case, $\gamma$ is set to 4.0.
 
 
 \chapter{Performance Evaluation}
 In this section, we will introduce the content of the experiment, including the experimental design, experimental environment, and discuss the results of the experiment.
 
-\section{Experimental Design}
-In our experiment, we used the Coco dataset \cite{lin2014microsoft} as the training set. Due to the large size of the Coco dataset and limited experimental resources, we randomly sampled 20,000 data instances for training. A total of 10 epochs were conducted. Table \ref{Fig.DDPG parameter} presents the training parameters of DDPG.
+\section{Experimental Setup and Design}
+In our experiment, we used the Coco dataset \cite{lin2014microsoft} as the training set. Due to the large scale of the Coco dataset and limited experimental resources, we randomly sampled 20,000 data instances for training. A total of 10 epochs were conducted. We built our neural network using PyTorch and trained it using a GeForce RTX 3090. Table \ref{Fig.DDPG parameter} presents the training parameters for DDPG.
 
-During the training process, we primarily monitor changes in rewards. After training is completed, we proceed with testing. In our testing experiment, we utilize 5000 images, observing the score difference between the adjusted images and the original ones. We will also perform a paired sample t-test to assess the validity of the test. Ultimately, we will compare the performance differences between object detection models preprocessed with DDPG and those without DDPG preprocessing. We will evaluate our results based on two key metrics: recall and precision.
+During the training process, we primarily monitor changes in rewards. After training is completed, we proceed with testing. In our testing experiment, we utilize 5000 images, observing the score difference between the adjusted images and the original ones, and recorded the distribution of conversion factors. We will also perform a paired sample t-test to assess the validity of the test. Ultimately, we will compare the performance differences between object detection models preprocessed with DDPG and those without DDPG preprocessing.
 
 \begin{table}[H]
 	\centering
@@ -302,9 +306,7 @@ During the training process, we primarily monitor changes in rewards. After trai
 \section{Experimental Result}
 After designing and conducting the experiments, the next step is to analyze and interpret our results. In this section, we will present our experimental results in detail and delve into the underlying reasons for these outcomes.
 
-\newpage
 \subsection{DDPG Training Reward}
-
 As shown in the figure \ref{Fig.Training reward}, after 10 epochs of training, our reward finally converged to 0.05. Our reward function is designed to easily generate so-called sparse rewards. In many images, the reward value is 0. There may be two reasons for this: one is that the objects in the image may have been completely detected, so no matter how the image is adjusted, its precision and recall will not increase, resulting in a reward of 0; another possible reason is that DDPG has not learned how to effectively adjust the image, thus getting the same detection result, and therefore the reward is 0. These two possible factors lead to a convergence of reward value at a lower level. However, although the reward seems to converge only to a relatively small value, it is still greater than 0, implying that DDPG has learned how to adjust the image to improve the effect of object detection.
 \begin{figure}[H] 
     \centering 
@@ -313,20 +315,16 @@ As shown in the figure \ref{Fig.Training reward}, after 10 epochs of training, o
     \label{Fig.Training reward} 
 \end{figure}
 
-\newpage
 \subsection{Test Score Differences with DDPG}
-
-Among our 5,000 test images, more than 4000 images had a score difference of zero. This may suggest that in these images, DDPG's preprocessing did not change the result of object detection. For the remaining approximately 900 images, we observed a difference in scores, of which 691 images had a positive score difference, and 203 images had a negative score difference, as shown in Figure \ref{Fig./Test difference of score}.
+Among our 5,000 test images, more than 4000 images had a score difference of zero. This may suggest that in these images, DDPG's preprocessing did not change the result of object detection. For the remaining approximately 900 images, we observed a difference in scores, of which 691 images had a positive score difference, and 203 images had a negative score difference, as shown in Figure \ref{Fig.Test difference of score}.
 
 A positive score difference implies that the image preprocessed by DDPG is superior to the original image in terms of object detection results, while a negative score difference means the detection effect is worse. However, we can see that among the images with a score difference, the number of images with a positive score difference is significantly more than the images with a negative score difference. This result indicates that using DDPG for preprocessing can improve the effect of object detection in some cases. However, we also noticed that for a portion of images (about 4\% of the test images), DDPG preprocessing may lead to a decrease in object detection efficiency. This could indicate that in certain special cases, the DDPG model has not yet found an appropriate preprocessing strategy.
 
-In our analysis of the score differences, we also calculated the average and standard deviation of these differences. We found that the average score difference was 0.057, indicating that overall, the object detection scores of images preprocessed by DDPG slightly improved compared to the original images. The standard deviation of the score differences was 0.158, which shows a relatively large range of score differences, suggesting that the impact of DDPG preprocessing on object detection varies among different images.
-\newpage
 \begin{figure}[H] 
     \centering 
     \includegraphics[width=\textwidth]{images/test difference of score.png}
     \caption{Test difference of score} 
-    \label{Fig./Test difference of score} 
+    \label{Fig.Test difference of score} 
 \end{figure}
 
 \begin{table}[H]
@@ -342,17 +340,48 @@ In our analysis of the score differences, we also calculated the average and sta
     \caption{Mean and standard deviation of score difference}
 \end{table}
 
+In our analysis of the score differences, we also calculated the average and standard deviation of these differences. We found that the average score difference was 0.057, indicating that overall, the object detection scores of images preprocessed by DDPG slightly improved compared to the original images. The standard deviation of the score differences was 0.158, which shows a relatively large range of score differences, suggesting that the impact of DDPG preprocessing on object detection varies among different images.
+
+\subsection{Test Action Distribution of the Trained DDPG}
+During the testing process, we recorded various actions taken by DDPG. The results are shown in Figure \ref{Fig.Action distribution}.
+
+\begin{figure}[H] 
+    \centering 
+    \includegraphics[width=\textwidth]{images/action distribution.png}
+    \caption{Action distribution}
+    \label{Fig.Action distribution} 
+\end{figure}
+\clearpage
+
+\begin{table}[H]
+    \centering
+    \caption{Mean and standard deviation of action distribution}
+    \label{table:Test action distribution}
+    \begin{tabular}{ccc}
+        \toprule
+        & \textbf{Mean} & \textbf{Standard Deviation} \\
+        \midrule
+        Brightness & 0.86 & 0.09 \\
+        Saturation & 1.09 & 0.09 \\
+        Contrast & 0.94 & 0.10 \\
+        Sharpness & 1.14 & 0.09 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The results indicate that DDPG prefers to slightly decrease image brightness (with an average value of 0.86), which may enhance the model's ability to identify image content. DDPG also tends to slightly increase saturation (with an average value of 1.09), emphasizing colors and enhancing the distinction between objects and backgrounds. Meanwhile, DDPG slightly reduces contrast (average value of 0.94), preventing overexposure or underexposure issues and enhancing object features. In addition, DDPG leans towards increasing image sharpness (average value of 1.14), making the image details more distinct. The standard deviation for each transformation factor is close to 0.1, indicating the stability of DDPG's adjustment strategy.
 
 \subsection{Paired Sample t-Test Results and Implications}
-To quantify these observations and determine whether DDPG preprocessing has a statistically significant effect on object detection, we conducted a Paired Sample t-Test. In this t-test, we considered the original score and the score after DDPG preprocessing for each image as a pair of matched samples.
+In order to quantify these observations and determine statistically whether DDPG preprocessing has had an effect on object detection, we performed a one-tailed paired sample t-test. In our paired sample t-test, we regarded the original score of each image and the score after DDPG preprocessing as a pair of matched samples. We chose a one-tailed test because we expected that DDPG preprocessing would improve object detection.
 
-In order to correctly interpret the results of a paired sample t-test, we must consider the meaning of the t statistic and the p value. In this experiment, the t statistic is 8.803, which quantifies the degree of difference between the object detection scores of the original images and those processed by DDPG. The sign of the t statistic reflects the direction of this difference - in our case, a positive t statistic indicates that the average score of images processed by DDPG is higher than that of the original images.
+To correctly interpret the results of the paired sample t-test, we must consider the meanings of the t-statistic and the p-value. In this experiment, the t-statistic was 8.803, which quantifies the degree of difference between the scores of the original images and the scores of the images after DDPG processing. The sign of the t-statistic reflects the direction of this difference - in our case, a positive t-statistic indicates that the average score of the images processed by DDPG is higher than the average score of the original images.
 
-Next, we consider the p-value, a statistical indicator used to determine whether results are significant. Specifically, the p-value is the probability of observing our actual data (or more extreme data) given that our null hypothesis is true. In this experiment, the null hypothesis is "there is no significant difference between the scores of the original images and the images processed by DDPG." Our obtained p-value is 1.861e-18, a very small number that is far below typical significance level thresholds (such as 0.05 or 0.01). Therefore, we have ample evidence to reject the null hypothesis and conclude that there is a significant difference between the scores of the original images and those processed by DDPG.
+Next, we consider the p-value, which is a measure used statistically to determine whether the results are significant. In this one-tailed test, the p-value is the probability of observing our actual data (or more extreme data) under the null hypothesis. In this experiment, the null hypothesis is "the score after DDPG preprocessing is lower than the original image score". We obtained a p-value of 1.86e-18, which is a very small value, much lower than the general significance level threshold (such as 0.05 or 0.01). Therefore, we have sufficient evidence to reject the null hypothesis and conclude that the score of images after DDPG preprocessing is higher than that of the original images.
 
 \begin{table}[H]
     \centering
     \label{table:t_test_results} 
+    \caption{One-tailed paired t-test results for image score}
     \begin{tabular}{c c c}
         \toprule
         & \textbf{t-statistic} & \textbf{p-value} \\
@@ -360,22 +389,23 @@ Next, we consider the p-value, a statistical indicator used to determine whether
         \textbf{Paired Samples} & 8.803 & 1.861e-18 \\
         \bottomrule
     \end{tabular}
-    \caption{Paired t-test results for image score}
 \end{table}
 
 \subsection{DDPG Preprocessing in Object Detection: A Comparison}
 To evaluate the impact of DDPG preprocessing on the performance of the object detection model, we separately compared the performance of the object detection models that used DDPG preprocessing and those that did not on the two main performance indicators: precision and recall. As shown in Figure \ref{Fig.Comparison result}, the object detection model processed by DDPG is 2.3\% higher in precision and 0.9\% higher in recall than the model not processed by DDPG.
 
 These results show that DDPG preprocessing can improve the performance of object detection. Specifically, the improvement in precision means that our model's ability to predict correct objects has improved, reducing false positives. The improvement in recall implies that our model can more comprehensively identify objects in the image, reducing the occurrence of false negatives.
+
 \begin{figure}[H] 
     \centering 
-    \includegraphics[width=\textwidth]{images/comparison result.png}
+    \includegraphics[width=0.9\textwidth]{images/comparison result.png}
     \caption[Comparison Result]{Comparison of Object Detection Performance with and without DDPG Preprocessing} 
     \label{Fig.Comparison result} 
 \end{figure}
 
 \begin{table}[H]
     \centering
+    \caption{Comparison of yolov7 and yolov7\_RL}
     \label{table:comparison_result}
     \begin{tabular}{l c c}
         \toprule
@@ -385,7 +415,6 @@ These results show that DDPG preprocessing can improve the performance of object
         \textbf{yolov7\_RL} & 0.523 & 0.415 \\
         \bottomrule
     \end{tabular}
-    \caption{Comparison of yolov7 and yolov7\_RL}
 \end{table}
 
 \newpage
@@ -430,8 +459,16 @@ These results show that DDPG preprocessing can improve the performance of object
     \caption[Successful example with DDPG adjustments]{Successful example that demonstrate the difference between the original images (left) and their DDPG-adjusted versions (right). It's noteworthy that objects that were not detected in the original images are successfully identified in the processed images.}
 \end{figure}
 
-\chapter{Conclusion}
+\chapter{Conclusion and Future Work}
+\section{Conclusion}
 In this research, we proposed and tested a novel object detection method that combines deep reinforcement learning DDPG with the object detection model YOLOv7. Our results indicate that image preprocessing with DDPG can improve the precision and recall rates of object detection. However, this method might reduce detection effectiveness in some instances. Future studies should focus on further optimization of the DDPG model to cater to various image conditions. Additionally, our experiment was limited by the scale of our dataset, an issue we plan to address in future research by expanding our training and testing sets. Overall, our study provides a fresh perspective on improving the performance of object detection.
+
+\section{Future work}
+In our future research, we plan to explore several key directions to improve our approach. Firstly, we intend to compare the speed of object detection with and without the application of DDPG preprocessing. This is a critical issue because while our method can enhance the precision and recall rates of object detection, if it significantly increases processing time, its utility in practical applications might be limited. Therefore, we aim to further optimize our model to ensure that it enhances performance without excessively consuming computational resources.
+
+Secondly, we plan to use data augmentation during the training of the DDPG model. Data augmentation, through various transformations such as rotation, scaling, translation, and others, aims to increase the model's generalization capabilities. We believe this could help the model adapt better to different imaging conditions and potentially further enhance the performance of object detection.
+
+Lastly, we aim to compare our approach with other studies, such as the method proposed in \cite{nayak2020reinforcement}. Through such comparisons, we can gain a deeper understanding of the strengths and weaknesses of our method under different circumstances, and find potential areas of improvement. This will not only help us refine our approach but also contribute to advancing research in the field of object detection.
 
 \newpage
 \AddToContents{Bibliography}
