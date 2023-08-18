@@ -1,15 +1,15 @@
-# Deep Reinforcement Learning for Enhancing Object Detection Performance
+# DRL for Enhancing Object Detection Performance
 
-# Requirements
+## Requirements
 * xelatex
 * biber
 
-# Recommended
+## Recommended
 * perl module Data::Lock  (to run the compile-thesis-from-scratch.pl script)
 * emacs  (always recommended :)
 
-# Usage
-## Compile Document
+## Usage
+### Compile Document
     % perl compile-thesis-from-scratch.pl compile-opts.tex
 
 or manually:
@@ -30,18 +30,18 @@ just:
 should be enough to update.
 
 
-# File Summary
+## File Summary
 
-## Files Users Edit
+### Files Users Edit
     thesis.tex        Main thesis document.
     thesis.bib        To hold references
     config-opts.tex   Current compile options.  Better not to place it in git.
 
-## Latex Formatting Files (users should not need to edit)
+### Latex Formatting Files (users should not need to edit)
     PHlab-thesis.cls  class file.
     fonts-config.sty  configures fonts.
     frontmatter.tex   abstract, committee signature page, table of contents, nomenclature.
 
-## Convenience Scripts
+### Convenience Scripts
     compile-thesis-from-scratch.pl   Full compile from scratch.
     latex-cleanup-tempfiles.pl       Delete latex temp files.
